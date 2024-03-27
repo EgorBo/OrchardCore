@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,18 +24,14 @@ namespace OrchardCore.Contents.Controllers
             _authorizationService = authorizationService;
         }
 
+        static Dictionary<string, ContentItem> _cache = new();
+
         public async Task<IActionResult> Display(string contentItemId, string jsonPath)
         {
-            var contentItem = await _contentManager.GetAsync(contentItemId, jsonPath);
-
-            if (contentItem == null)
+            ContentItem contentItem;
+            if (!_cache.TryGetValue(contentItemId, out contentItem))
             {
-                return NotFound();
-            }
-
-            if (!await _authorizationService.AuthorizeAsync(User, CommonPermissions.ViewContent, contentItem))
-            {
-                return this.ChallengeOrForbid();
+                _cache[contentItemId] = contentItem = await _contentManager.GetAsync(contentItemId, jsonPath);
             }
 
             var model = await _contentItemDisplayManager.BuildDisplayAsync(contentItem, this);
