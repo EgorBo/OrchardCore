@@ -34,9 +34,9 @@ namespace OrchardCore.Contents.Controllers
                 _cache[contentItemId] = contentItem = await _contentManager.GetAsync(contentItemId, jsonPath);
             }
 
-            var model = await _contentItemDisplayManager.BuildDisplayAsync(contentItem, this);
+            //var model = await _contentItemDisplayManager.BuildDisplayAsync(contentItem, this);
 
-            return View(model);
+            return NotFound();
         }
 
         public async Task<IActionResult> Preview(string contentItemId)
